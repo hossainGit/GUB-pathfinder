@@ -1,0 +1,6 @@
+{
+  "name": "Campus Pathfinding Simulator",
+  "description": "An interactive grid-based campus pathfinding simulator that demonstrates BFS and Dijkstra algorithms, including variable-cost pathing with danger zones.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
