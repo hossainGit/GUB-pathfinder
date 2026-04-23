@@ -2,7 +2,8 @@ import React, { useState, useRef } from 'react';
 import { ToolbarTop } from './components/ToolbarTop';
 import { ToolbarBottom } from './components/ToolbarBottom';
 import { MapCanvas } from './components/MapCanvas';
-import { createDefault100x200Maze, applyDanger } from './lib/maze';
+import { applyDanger } from './lib/maze';
+import { defaultMaze } from './lib/defaultMaze';
 import { runBFS, runDijkstra } from './lib/pathfinder';
 import { AlgorithmType, Point, RunStats, SearchStep, SpeedMode, Tool } from './types';
 
@@ -10,7 +11,7 @@ const INITIAL_START = { x: 10, y: 10 };
 const INITIAL_END = { x: 90, y: 50 };
 
 export default function App() {
-  const [maze, setMaze] = useState(createDefault100x200Maze());
+  const [maze, setMaze] = useState<number[][]>(defaultMaze);
   
   const clearDangerFor = (m: number[][]) => Array.from({ length: m.length }, () => new Array(m[0]?.length || 0).fill(0));
 
@@ -132,15 +133,17 @@ export default function App() {
         result = gen.next();
         if (result.done) break;
         
-        if (result.value.explored.length > 0) {
-            currentExplored.push(...result.value.explored);
-            exploredCount += result.value.explored.length;
+        const step = result.value as SearchStep;
+        if (step.explored.length > 0) {
+            currentExplored.push(...step.explored);
+            exploredCount += step.explored.length;
         }
         
-        if (result.value.found) break;
+        if (step.found) break;
       }
 
       if (result && !result.done) {
+        const finalStep = result.value as SearchStep;
         setExplored([...currentExplored]);
         setStats(prev => ({
             ...prev,
@@ -148,13 +151,13 @@ export default function App() {
             runtimeMs: performance.now() - startTime
         }));
 
-        if (result.value.found) {
-            setPath(result.value.path || []);
+        if (finalStep.found) {
+            setPath(finalStep.path || []);
             setStats(prev => ({
                 ...prev,
                 found: true,
-                length: result.value.path?.length || 0,
-                cost: result.value.cost || 0,
+                length: finalStep.path?.length || 0,
+                cost: finalStep.cost || 0,
                 runtimeMs: performance.now() - startTime
             }));
             setIsRunning(false);
