@@ -20,9 +20,9 @@ export default function App() {
   const [startPoint, setStartPoint] = useState<Point>(INITIAL_START);
   const [endPoint, setEndPoint] = useState<Point>(INITIAL_END);
   
-  const [tool, setTool] = useState<Tool>('pan');
+  const [tool, setTool] = useState<Tool>('start');
   const [algorithm, setAlgorithm] = useState<AlgorithmType>('BFS');
-  const [speed, setSpeed] = useState<SpeedMode>(2);
+  const [speed, setSpeed] = useState<SpeedMode>(3);
   
   const [explored, setExplored] = useState<Point[]>([]);
   const [path, setPath] = useState<Point[]>([]);
@@ -35,9 +35,6 @@ export default function App() {
     exploredCount: 0,
     runtimeMs: 0
   });
-
-  const [showLoadModal, setShowLoadModal] = useState(false);
-  const [mapInput, setMapInput] = useState('');
 
   const runnerRef = useRef<number | null>(null);
 
@@ -174,33 +171,12 @@ export default function App() {
     runnerRef.current = requestAnimationFrame(tick);
   };
 
-  const handleLoadMap = () => {
-    try {
-      const firstBracket = mapInput.indexOf('[');
-      const lastBracket = mapInput.lastIndexOf(']');
-      if (firstBracket === -1 || lastBracket === -1) throw new Error('Could not find array brackets');
-      
-      const arrayText = mapInput.substring(firstBracket, lastBracket + 1);
-      const parsed = JSON.parse(arrayText) as number[][];
-      if (!Array.isArray(parsed) || !Array.isArray(parsed[0])) {
-         throw new Error('Invalid format');
-      }
-      setMaze(parsed);
-      resetMapTo(parsed);
-      setShowLoadModal(false);
-      setMapInput('');
-    } catch(e) {
-      alert("Failed to parse map. Please ensure it is a valid 2D array of 0s and 1s.");
-    }
-  };
-
   return (
     <div className="flex flex-col h-screen w-full bg-slate-50 overflow-hidden text-slate-900 font-sans">
       <ToolbarTop 
         tool={tool} setTool={setTool}
         algorithm={algorithm} setAlgorithm={setAlgorithm}
         onClearDanger={clearDanger}
-        onLoadMap={() => setShowLoadModal(true)}
       />
       
       <MapCanvas 
@@ -209,7 +185,7 @@ export default function App() {
         explored={explored} path={path}
         onCellClick={handleCellClick}
         onCellDrag={handleCellDrag}
-        isPanning={tool === 'pan'}
+        isPanning={false}
       />
 
       <ToolbarBottom 
@@ -220,37 +196,6 @@ export default function App() {
         onReset={resetMap}
         stats={stats}
       />
-
-      {showLoadModal && (
-        <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-2xl flex flex-col max-h-[90vh]">
-            <h2 className="text-xl font-bold mb-2">Load Python Array</h2>
-            <p className="text-sm text-slate-500 mb-4">
-              Paste your python array `maze = [[0, ...], ... ]` below.
-            </p>
-            <textarea
-              className="flex-1 min-h-[300px] font-mono text-sm p-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              value={mapInput}
-              onChange={(e) => setMapInput(e.target.value)}
-              placeholder="[\n  [0, 0, ...],\n  ...\n]"
-            />
-            <div className="mt-4 flex justify-end gap-3">
-              <button
-                onClick={() => setShowLoadModal(false)}
-                className="px-4 py-2 font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleLoadMap}
-                className="px-4 py-2 font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
-              >
-                Load Map
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

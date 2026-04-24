@@ -21,4 +21,4 @@ export type SearchStep = {
   cost?: number;
 };
 
-export type Tool = 'start' | 'end' | 'danger' | 'pan';
+export type Tool = 'start' | 'end' | 'danger';

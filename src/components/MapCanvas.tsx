@@ -231,7 +231,7 @@ export function MapCanvas({
             transform: 'translate(-50%, -50%)'
           }}
         >
-          <div className="bg-red-600 rounded-md shadow-[0_4px_12px_rgba(220,38,38,0.5)] text-white flex items-center justify-center border-2 border-white/80 w-full h-full p-1">
+          <div className="bg-green-600 rounded-md shadow-[0_4px_12px_rgba(22,163,74,0.5)] text-white flex items-center justify-center border-2 border-white/80 w-full h-full p-1">
             <Flag className="w-full h-full stroke-[2.5]" />
           </div>
         </div>
